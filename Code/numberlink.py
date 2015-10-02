@@ -18,6 +18,57 @@ class NumberLink(Problem):
 	def successor(self, state):
 		pass
 
+###############		
+# State class #
+###############
+
+class State:
+	"""State representation of a numberlink problem.
+		The grid is represented by a matrix (double dimension table) with the top left corner represented by grid[0][0].
+		The currentPath indicates the current path in construction (a character).
+		The lastExtension variable stores the coordinates (x,y) of the last element extented (a table with two value for x and y)."""
+	def __init__(self, grid, currentPath, lastExtension):
+		self.grid = grid
+		self.currentPath = currentPath	
+		self.lastExtension = lastExtension	
+			
+	def action(action):
+		"""Apply the action on the grid based on the currentPath and the lastExtension coordinates.
+			The action should be a string with the value of ["right", "down", "left", "up"] that indicates in which direction the lastExtension
+			should be extented"""
+		i = lastExtension[0]
+		j= lastExtension[1]
+		if action == "left":
+			i = i-1
+		elif action == "right":
+			i = i+1
+		elif action == "down":
+			j = j+1
+		elif action == "up":
+			j = j-1
+		grid[i][j] = currentPath
+		lastExtension[0] = i
+		lastExtension[1] = j
+		
+	def connected(self):
+		"""Check if the currentPath is finished. 
+		For that we check if the last element extented has 2 neighboors from the same path (with the same character)."""
+		neighboors = 0
+		i = lastExtension[0]
+		j= lastExtension[1]
+		if grid[i+1][j] == currentPath:
+			neighboors = neighboors+1
+		if grid[i-1][j] == currentPath:
+			neighboors = neighboors+1
+		if grid[i][j+1] == currentPath:
+			neighboors = neighboors+1
+		if grid[i][j-1] == currentPath:
+			neighboors = neighboors+1
+		return (neighboors==2)
+			
+	def __str__(self):
+		print(self.grid)
+
 ###################### 
 # Auxiliary function #
 ######################
