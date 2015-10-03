@@ -10,10 +10,18 @@ from search import *
 
 class NumberLink(Problem):
 	def __init__(self, init):
+		"""  TODO: Initialize the given problem. For that you should use the state class given below. Also initialize a class instance
+			"paths" that is a dictionnary where the key is the path indicator (a character) and the value a table of two dimensions
+			that stocks the 2 endpoints of a path in a table like this [[x1,y1][x2,y2]]. Also initialize the first path to construct using the nextPath method."""
 		pass
 
 	def goal_test(self, state):
-		pass
+		"""Return true if the given state is the goal.
+			For that we check if all paths is completed."""
+		for key in self.paths.keys():
+			if key not in state.pathsCompleted:
+				return False
+		return True
     
 	def successor(self, state):
 		"""Return all the successors of a current state.
@@ -21,18 +29,17 @@ class NumberLink(Problem):
 			"left", "right", "down" or "up". """
 		if state.connected():
 			state = nextPath(state)
-		if state == None: "The current state can't give a solution."
-			pass
-		actions = state.possibleActions()
-		for i in range(0, len(actions)):			"Generate all successors based on the possible actions."
-			yield State(state.grid, state.currentPath, state.lastExtension, state.pathsCompleted).action(actions[i])
+		if state != None: "The current state can't give a solution."
+			actions = state.possibleActions()
+			for i in range(0, len(actions)):			"Generate all successors based on the possible actions."
+				yield State(state.grid, state.currentPath, state.lastExtension, state.pathsCompleted).action(actions[i])
 
 	def nextPath(self, state):
 		"""Return the new state containing the new path to construct."""
 		newState = State(state.grid, state.currentPath, state.lastExtension, state.pathsCompleted)
 		n = 9 							"Number of possible actions for a path"
 		for key in self.paths.keys()
-			if state.pathsCompleted[key] != true:	"The path isn't completed"
+			if key not in state.pathsCompleted:	"The path isn't completed"
 				endpoint1 = self.paths[key][0] "first endpoint"
 				endpoint2 = self.paths[key][1] "second endpoint"
 				if pathExists(state.grid, endpoint1, endpoint2) != True: "The current state cannot give a solution"
@@ -99,6 +106,8 @@ se
 		grid[i][j] = currentPath
 		lastExtension[0] = i
 		lastExtension[1] = j
+		if self.connected() == True:
+			pass
 		
 	def connected(self):
 		"""Check if the currentPath is finished. 
