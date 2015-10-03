@@ -21,8 +21,8 @@ class NumberLink(Problem):
 			"left", "right", "down" or "up". """
 		if state.connected():
 			state = nextPath(state)
-		if state == None:
-			return None	
+		if state == None: "The current state can't give a solution."
+			pass
 		actions = state.possibleActions()
 		for i in range(0, len(actions)):			"Generate all successors based on the possible actions."
 			yield State(state.grid, state.currentPath, state.lastExtension, state.pathsCompleted).action(actions[i])
