@@ -16,7 +16,10 @@ class NumberLink(Problem):
 		pass
     
 	def successor(self, state):
-		pass
+		if state.connected():
+			"choose a new path and verify if that path is possible"
+		else:
+			"do a while loop with all action possible, it must be a yield"
 
 ###############		
 # State class #
@@ -66,6 +69,21 @@ class State:
 			neighboors = neighboors+1
 		return (neighboors==2)
 			
+	def possibleActions(self):
+		"""Return the possible actions possible on the current state"""
+		actions = []
+		i = lastExtension[0]
+		j= lastExtension[1]
+		if i != 0 and grid[i-1][j] == '.':
+			actions.append("left")
+		if i != len(actions) and grid[i+1][j] == '.':
+			actions.append("right")
+		if j != 0 and grid[i][j+1] == '.':
+			actions.append("down")
+		if j != len(actions[0]) and grid[i][j-1] == '.':
+			actions.append("up")
+		return actions
+		
 	def __str__(self):
 		print(self.grid)
 
