@@ -16,11 +16,55 @@ class NumberLink(Problem):
 		pass
     
 	def successor(self, state):
+		"""Return all the successors of a current state.
+			A successor is a new state in which we applied one of the following action : 
+			"left", "right", "down" or "up". """
 		if state.connected():
-			"choose a new path and verify if that path is possible"
-		else:
-			"do a while loop with all action possible, it must be a yield"
+			state = nextPath(state)
+		if state == None:
+			return None	
+		actions = state.possibleActions()
+		for i in range(0, len(actions)):			"Generate all successors based on the possible actions."
+			yield State(state.grid, state.currentPath, state.lastExtension, state.pathsCompleted).action(actions[i])
 
+	def nextPath(self, state):
+		"""Return the new state containing the new path to construct."""
+		newState = State(state.grid, state.currentPath, state.lastExtension, state.pathsCompleted)
+		n = 9 							"Number of possible actions for a path"
+		for key in self.paths.keys()
+			if state.pathsCompleted[key] != true:	"The path isn't completed"
+				endpoint1 = self.paths[key][0] "first endpoint"
+				endpoint2 = self.paths[key][1] "second endpoint"
+				if pathExists(state.grid, endpoint1, endpoint2) != True: "The current state cannot give a solution"
+					return None
+				n1 = numberOfPossibleActions(state.grid, endpoint1) 
+				n2 = numberOfPossibleActions(state.grid, endpoint2)
+				temp = n1 + n2
+				if temp < n:
+					pathToConstruct = key
+					pointToExtend = (endpoint1 if n1 < n2 else endpoint2)
+					newState.currentPath = key
+					newState.lastExtension = pointToExtend
+		return newState
+				
+		
+	def numberOfPossibleActions(grid, position):
+		"""Return the number of possible action for the given element in the grid.
+			grid is a table of 2 dimensions and position the coordinates of the element to consider."""
+		num = 0
+		i = position[0]
+		j = position[1]
+		if  i != 0 and grid[i-1][j] == '.':
+			num = num+1
+		if  i != len(grid)-1 and grid[i+1][j] == '.':
+			num = num+1
+		if  j != 0 and grid[i][j-1] == '.':
+			num = num+1
+		if  j != len(grid[0])-1 and grid[i][j+1] == '.':
+			num = num+1
+		return num
+		
+			
 ###############		
 # State class #
 ###############
@@ -29,11 +73,14 @@ class State:
 	"""State representation of a numberlink problem.
 		The grid is represented by a matrix (double dimension table) with the top left corner represented by grid[0][0].
 		The currentPath indicates the current path in construction (a character).
-		The lastExtension variable stores the coordinates (x,y) of the last element extented (a table with two value for x and y)."""
-	def __init__(self, grid, currentPath, lastExtension):
+		The lastExtension variable stores the coordinates (x,y) of the last element extented (a table with two value for x and y).
+		The pathsCompleted indicates the paths already completed ( a dictionnary)."""
+	def __init__(self, grid, currentPath, lastExtension, pathsCompleted):
 		self.grid = grid
 		self.currentPath = currentPath	
-		self.lastExtension = lastExtension	
+		self.lastExtension = lastExtension
+		self.pathsCompleted = pathsCompleted
+se		
 			
 	def action(action):
 		"""Apply the action on the grid based on the currentPath and the lastExtension coordinates.
@@ -55,7 +102,8 @@ class State:
 		
 	def connected(self):
 		"""Check if the currentPath is finished. 
-		For that we check if the last element extented has 2 neighboors from the same path (with the same character)."""
+		For that we check if the last element extented has 2 neighboors from the same path (with the same character).
+		If the path is finished, add the path in the pathsCompleted."""
 		neighboors = 0
 		i = lastExtension[0]
 		j= lastExtension[1]
@@ -67,7 +115,10 @@ class State:
 			neighboors = neighboors+1
 		if grid[i][j-1] == currentPath:
 			neighboors = neighboors+1
-		return (neighboors==2)
+		if neighboors == 2 :
+			pathsCompleted[currentPath] = True
+			return true
+		return false
 			
 	def possibleActions(self):
 		"""Return the possible actions possible on the current state"""
@@ -76,11 +127,11 @@ class State:
 		j= lastExtension[1]
 		if i != 0 and grid[i-1][j] == '.':
 			actions.append("left")
-		if i != len(actions) and grid[i+1][j] == '.':
+		if i != len(actions)-1 and grid[i+1][j] == '.':
 			actions.append("right")
 		if j != 0 and grid[i][j+1] == '.':
 			actions.append("down")
-		if j != len(actions[0]) and grid[i][j-1] == '.':
+		if j != len(actions[0])-1 and grid[i][j-1] == '.':
 			actions.append("up")
 		return actions
 		
