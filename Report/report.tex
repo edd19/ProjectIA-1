@@ -70,6 +70,8 @@ Here are the answers to the questions regarding the AIMA library.
 	\item \textbf{How technically can you use the implementation of the closed list to deal with symmetrical states ? }\\
 	
 	By modifying the compare method of the type used as key as two symmetrical states are equal we can deal with it.
+	
+	%SOULI: Pas sur d'avoir compris
 		
 \end{enumerate}
 
@@ -81,19 +83,22 @@ Here are the answers to the questions regarding the AIMA library.
 	
 	The depth first search in general takes less time than the breadth first one. Also in this particular problem, the depth first has the completness property like the breadth first because there cannot have infinite search (the square can be filled). \\
 	
-	For the space occupied by the two serach algorithm, this is not a issue because we use a yield to expand a node and not a list. \\
+	For the space occupied by the two search algorithm, this is not a issue because we use a yield to expand a node and not a list. \\
 	
 	The breadth first is advantageous with trees that have a high branching factor.
+	%Me semble incomplet
 	
 	\item \textbf{How can we exploit the uniqueness of solution to reduce the search space? Why is the method pathExists useful?} \\
 	
-	The method pathExists is useful to know if a a current node don't give an answer. 
+	The method pathExists is useful to know if a a current node don't give an answer. \\
+	%Assez?
+	
 	
 	\item \textbf{Is the order in which we choose the paths important? How can we use this to reduce the search space? When starting a new path, we can choose to start with any of its two endpoint. How should this choice be done?} \\
 	
 	Yes it's important. Depending of the order, we can reduce the search space. For that, let's use the example case in your assignement pdf, if we take the D path first, we have 4 choices in total. But if we take the A, we have 5 choices. \\
 	
-	The choice of endpoins is also important because if we take, in the same example, the e path and take the e point located at the top-right corner, we only have one choice. \\
+	The choice of endpoints is also important because if we take, in the same example, the e path and take the e point located at the top-right corner, we only have one choice. \\
 	
 	\item \textbf{What are the advantages and disadvantages of using the tree and graph search for this problem. Which approach would you choose? Which approach allows you to avoid expending twice symmetrical states?} \\
 	
