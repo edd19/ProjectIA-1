@@ -14,10 +14,11 @@ class NumberLink(Problem):
 			"paths" that is a dictionnary where the key is the path indicator (a character) and the value a table of two dimensions
 			that stocks the 2 endpoints of a path in a table like this [[x1,y1][x2,y2]]. Also initialize the first path to construct using the nextPath method."""
 		self.paths = {}
-		self.paths['A'] = [[0,0],[2,0]]
-		self.paths['B'] = [[0,1],[2,1]]
-		self.paths['C'] = [[0,2],[2,2]]
-		grid = [['A', 'B','C'],['.','.','.'],['A', 'B','C']]
+		self.paths['A'] = [[0,0],[0,3]]
+		self.paths['B'] = [[1,0],[1,3]]
+		self.paths['C'] = [[2,0],[2,3]]
+		self.paths['D'] = [[3,0],[3,3]]
+		grid = [['A', '.','.', 'A'],['B','.','.','B'],['C', '.','.','C'], ['D', '.','.','D']]
 		state = State(grid, 'A', [0,0],{})
 		self.initial = state
 
@@ -39,12 +40,26 @@ class NumberLink(Problem):
 		if state is not None:
 			actions = state.possibleActions()
 			print(actions)
+			print(state.grid)
 			for i in range(0, len(actions)):
-				yield (actions[i], State(state.grid, state.currentPath, state.lastExtension, state.pathsCompleted).action(actions[i]))	
-
+				yield (actions[i], State(self.copyList(state.grid), state.currentPath, state.lastExtension.copy(), state.pathsCompleted.copy()).action(actions[i]))
+				
+				
+	def copyList(self, orig):
+		h = len(orig)
+		l = len(orig[0])
+		copy = []
+		line = []
+		for i in range(0, h):		
+			line = []
+			for j in range(0, l):
+				line.append(orig[i][j])
+			copy.append(line)
+		return copy
+	
 	def nextPath(self, state):
 		"""Return the new state containing the new path to construct."""
-		newState = State(state.grid, state.currentPath, state.lastExtension, state.pathsCompleted)
+		newState = State(self.copyList(state.grid), state.currentPath, state.lastExtension.copy(), state.pathsCompleted.copy())
 		n = 9;						"Number of possible actions for a path"
 		for key in self.paths.keys():
 			if key not in state.pathsCompleted:
@@ -141,9 +156,9 @@ class State:
 	def possibleActions(self):
 		"""Return the possible actions possible on the current state"""
 		actions = []
-		print(self.grid)
+		"""print(self.grid)
 		print(self.currentPath)
-		print(self.lastExtension)
+		print(self.lastExtension)"""
 		i = self.lastExtension[0]
 		j = self.lastExtension[1]
 		if i != 0 and self.grid[i-1][j] == '.':
