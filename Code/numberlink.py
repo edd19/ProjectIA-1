@@ -14,37 +14,66 @@ class NumberLink(Problem):
 			"paths" that is a dictionnary where the key is the path indicator (a character) and the value a table of two dimensions
 			that stocks the 2 endpoints of a path in a table like this [[x1,y1][x2,y2]]. Also initialize the first path to construct using the nextPath method."""
 		self.paths = {}
-		self.paths['A'] = [[0,0],[0,3]]
-		self.paths['B'] = [[1,0],[1,3]]
-		self.paths['C'] = [[2,0],[2,3]]
-		self.paths['D'] = [[3,0],[3,3]]
-		grid = [['A', '.','.', 'A'],['B','.','.','B'],['C', '.','.','C'], ['D', '.','.','D']]
+		self.paths['A'] = [[0,0],[5,3]]
+		self.paths['B'] = [[2,5],[6,7]]
+		self.paths['C'] = [[5,1],[5,7]]
+		self.paths['D'] = [[1,2],[6,6]]
+		self.paths['E'] = [[0,9],[3,6]]
+		self.paths['F'] = [[3,7],[7,0]]
+		
+		grid = [['A', '.','.', '.','.','.','.','.','.','E'],['.', '.','D','.','.','.','.','.','.','.'],
+				['.', '.','.', '.','.','B','.','.','.','.'],['.', '.','.','.','.','.','E','F','.','.'],
+				['.', '.','.', '.','.','.','.','.','.','.'],['.', 'C','.','A','.','.','.','C','.','.'],
+				['.', '.', '.','.','.','.','D','B','.','.'],['F', '.','.','.','.','.','.','.','.','.']]
 		state = State(grid, 'A', [0,0],{})
 		self.initial = state
 
 	def goal_test(self, state):
 		"""Return true if the given state is the goal.
 			For that we check if all paths is completed."""
+		self.connected(state)
 		for key in self.paths.keys():
 			if key not in state.pathsCompleted:
 				return False
-		print(state.grid)
+		for i in range(0, len(state.grid)):
+			print(state.grid[i])
 		return True
     
 	def successor(self, state):
 		"""Return all the successors of a current state.
 			A successor is a new state in which we applied one of the following action : 
 			"left", "right", "down" or "up". """
-		if state.connected():
+		if self.connected(state):
 			state = self.nextPath(state)
 		if state is not None:
 			actions = state.possibleActions()
-			print(actions)
-			print(state.grid)
 			for i in range(0, len(actions)):
-				yield (actions[i], State(self.copyList(state.grid), state.currentPath, state.lastExtension.copy(), state.pathsCompleted.copy()).action(actions[i]))
+				newState = State(self.copyList(state.grid), state.currentPath, state.lastExtension.copy(), state.pathsCompleted.copy()).action(actions[i])
+				if self.isPossible(newState):
+					yield (actions[i], newState)
 				
-				
+	
+	def connected(self, state):
+		"""Check if the current path is finished. For that we check if the two endpoints has a neighboor"""
+		endpoints = self.paths[state.currentPath]	
+		for i in range(0, len(endpoints)):
+			point = endpoints[i]
+			i = point[0]
+			j = point[1]
+			if i != 0 and state.grid[i-1][j] == state.currentPath:
+				pass
+			elif i != len(state.grid)-1 and state.grid[i+1][j] == state.currentPath:
+				pass
+			elif j != 0 and state.grid[i][j-1] == state.currentPath:
+				pass
+			elif j != len(state.grid[0])-1 and state.grid[i][j+1] == state.currentPath:
+				pass
+			else:
+				return False
+		state.pathsCompleted[state.currentPath] = True
+		return True
+			
+	
 	def copyList(self, orig):
 		h = len(orig)
 		l = len(orig[0])
@@ -65,9 +94,6 @@ class NumberLink(Problem):
 			if key not in state.pathsCompleted:
 				endpoint1 = self.paths[key][0]; "first endpoint"
 				endpoint2 = self.paths[key][1]; "second endpoint"
-				if pathExists(state.grid, endpoint1, endpoint2) != True:
-					print("No path")
-					pass
 				n1 = self.numberOfPossibleActions(state.grid, endpoint1)
 				n2 = self.numberOfPossibleActions(state.grid, endpoint2)
 				temp = n1 + n2
@@ -95,6 +121,15 @@ class NumberLink(Problem):
 			num = num+1
 		return num
 		
+	def isPossible(self, state):
+		"""Return true if the current state can have a solution.
+			A state don't have a solution if a path can't be construct."""
+		for key in self.paths.keys():
+			if key not in state.pathsCompleted and key != state.currentPath:
+				if pathExists(state.grid, self.paths[key][0], self.paths[key][1]) == False:
+					return False
+		return True
+			
 			
 ###############
 # State class #
@@ -129,29 +164,7 @@ class State:
 		self.grid[i][j] = self.currentPath
 		self.lastExtension[0] = i
 		self.lastExtension[1] = j
-		if self.connected() == True:
-			pass
 		return self
-		
-	def connected(self):
-		"""Check if the currentPath is finished. 
-		For that we check if the last element extented has 2 neighboors from the same path (with the same character).
-		If the path is finished, add the path in the pathsCompleted."""
-		neighboors = 0
-		i = self.lastExtension[0]
-		j= self.lastExtension[1]
-		if  i != len(self.grid)-1 and self.grid[i+1][j] == self.currentPath:
-			neighboors = neighboors+1
-		if i != 0 and self.grid[i-1][j] == self.currentPath:
-			neighboors = neighboors+1
-		if j != len(self.grid[0])-1 and self.grid[i][j+1] == self.currentPath:
-			neighboors = neighboors+1
-		if j != 0 and self.grid[i][j-1] == self.currentPath:
-			neighboors = neighboors+1
-		if neighboors == 2 :
-			self.pathsCompleted[self.currentPath] = True
-			return True
-		return False
 			
 	def possibleActions(self):
 		"""Return the possible actions possible on the current state"""
@@ -161,14 +174,14 @@ class State:
 		print(self.lastExtension)"""
 		i = self.lastExtension[0]
 		j = self.lastExtension[1]
-		if i != 0 and self.grid[i-1][j] == '.':
-			actions.append("up")
-		if i != len(self.grid)-1 and self.grid[i+1][j] == '.':
-			actions.append("down")
 		if j != 0 and self.grid[i][j-1] == '.':
 			actions.append("left")
 		if j != len(self.grid[0])-1 and self.grid[i][j+1] == '.':
 			actions.append("right")
+		if i != len(self.grid)-1 and self.grid[i+1][j] == '.':
+			actions.append("down")
+		if i != 0 and self.grid[i-1][j] == '.':
+			actions.append("up")
 		return actions
 		
 	def __str__(self):
