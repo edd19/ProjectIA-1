@@ -14,19 +14,32 @@ class NumberLink(Problem):
 			"paths" that is a dictionnary where the key is the path indicator (a character) and the value a table of two dimensions
 			that stocks the 2 endpoints of a path in a table like this [[x1,y1][x2,y2]]. Also initialize the first path to construct using the nextPath method."""
 		self.paths = {}
-		self.paths['A'] = [[0,0],[5,3]]
-		self.paths['B'] = [[2,5],[6,7]]
-		self.paths['C'] = [[5,1],[5,7]]
-		self.paths['D'] = [[1,2],[6,6]]
-		self.paths['E'] = [[0,9],[3,6]]
-		self.paths['F'] = [[3,7],[7,0]]
-		
-		grid = [['A', '.','.', '.','.','.','.','.','.','E'],['.', '.','D','.','.','.','.','.','.','.'],
-				['.', '.','.', '.','.','B','.','.','.','.'],['.', '.','.','.','.','.','E','F','.','.'],
-				['.', '.','.', '.','.','.','.','.','.','.'],['.', 'C','.','A','.','.','.','C','.','.'],
-				['.', '.', '.','.','.','.','D','B','.','.'],['F', '.','.','.','.','.','.','.','.','.']]
-		state = State(grid, 'A', [0,0],{})
+		grid=[]
+		line=[]
+		file = open(init, "r")
+		i=0
+		j=0
+		while 1:
+			char = file.read(1)
+			if not char: break
+			if char.isalpha() or char==".":
+				line.append(char)
+			else:
+					i+=1
+					j=0
+					grid.append(line)
+					line=[]
+
+			if char in self.paths.keys():
+				self.paths[char].append([i,j])
+			else:
+				self.paths[char]=[[i,j]]			
+				j+=1
+		file.close
+
+		state = State(grid, 'A', self.paths["A"][0],{})
 		self.initial = state
+
 
 	def goal_test(self, state):
 		"""Return true if the given state is the goal.
@@ -55,7 +68,7 @@ class NumberLink(Problem):
 	
 	def connected(self, state):
 		"""Check if the current path is finished. For that we check if the two endpoints has a neighboor"""
-		endpoints = self.paths[state.currentPath]	
+		endpoints = self.paths[state.currentPath]       
 		for i in range(0, len(endpoints)):
 			point = endpoints[i]
 			i = point[0]
@@ -79,7 +92,7 @@ class NumberLink(Problem):
 		l = len(orig[0])
 		copy = []
 		line = []
-		for i in range(0, h):		
+		for i in range(0, h):           
 			line = []
 			for j in range(0, l):
 				line.append(orig[i][j])
@@ -89,7 +102,7 @@ class NumberLink(Problem):
 	def nextPath(self, state):
 		"""Return the new state containing the new path to construct."""
 		newState = State(self.copyList(state.grid), state.currentPath, state.lastExtension.copy(), state.pathsCompleted.copy())
-		n = 9;						"Number of possible actions for a path"
+		n = 9;                                          "Number of possible actions for a path"
 		for key in self.paths.keys():
 			if key not in state.pathsCompleted:
 				endpoint1 = self.paths[key][0]; "first endpoint"
@@ -143,7 +156,7 @@ class State:
 		The pathsCompleted indicates the paths already completed ( a dictionnary)."""
 	def __init__(self, grid, currentPath, lastExtension, pathsCompleted):
 		self.grid = grid
-		self.currentPath = currentPath	
+		self.currentPath = currentPath  
 		self.lastExtension = lastExtension
 		self.pathsCompleted = pathsCompleted
 			
@@ -221,7 +234,8 @@ def inBounds(grid, pos):
 
 problem=NumberLink(sys.argv[1])
 #example of bfs search
-node=depth_first_graph_search(problem)
+#node=depth_first_graph_search(problem)
+print(problem.initial.grid)
 """#example of print
 path=node.path()
 path.reverse()
