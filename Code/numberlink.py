@@ -24,19 +24,17 @@ class NumberLink(Problem):
 			if not char: break
 			if char.isalpha() or char==".":
 				line.append(char)
-			else:
-					i+=1
-					j=0
-					grid.append(line)
-					line=[]
-
-			if char in self.paths.keys():
-				self.paths[char].append([i,j])
-			else:
-				self.paths[char]=[[i,j]]			
+				if char in self.paths and char!=".":
+					self.paths[char].append([i,j])
+				elif char not in self.paths and char!=".":
+					self.paths[char]=[[i,j]]	
 				j+=1
+			else:
+				i+=1
+				j=0
+				grid.append(line)
+				line=[]		
 		file.close
-
 		state = State(grid, 'A', self.paths["A"][0],{})
 		self.initial = state
 
@@ -198,7 +196,12 @@ class State:
 		return actions
 		
 	def __str__(self):
-		print(self.grid)
+		message = ""
+		for i in range(0, len(self.grid)):
+			for j in range(0, len(self.grid[0])):
+				message = message + self.grid[i][j]
+			message = message + "\n"
+		return message
 
 ###################### 
 # Auxiliary function #
@@ -234,9 +237,9 @@ def inBounds(grid, pos):
 
 problem=NumberLink(sys.argv[1])
 #example of bfs search
-#node=depth_first_graph_search(problem)
-print(problem.initial.grid)
-"""#example of print
+node=depth_first_graph_search(problem)
+
+#example of print
 path=node.path()
 path.reverse()
 for n in path:
