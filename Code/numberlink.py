@@ -11,7 +11,7 @@ from search import *
 
 class NumberLink(Problem):
 	def __init__(self, init):
-		"""  TODO: Initialize the given problem. For that you should use the state class given below. Also initialize a class instance
+		""" Initialize the given problem. For that you should use the state class given below. Also initialize a class instance
 			"paths" that is a dictionnary where the key is the path indicator (a character) and the value a table of two dimensions
 			that stocks the 2 endpoints of a path in a table like this [[x1,y1][x2,y2]]. Also initialize the first path to construct using the nextPath method."""
 		self.paths = {}
@@ -42,8 +42,7 @@ class NumberLink(Problem):
 
 
 	def goal_test(self, state):
-		"""Return true if the given state is the goal.
-			For that we check if all paths is completed."""
+		"""Return true if the given state is the goal."""
 		if len(self.paths) == len(state.pathsCompleted):
 			return True
 		return False
@@ -56,9 +55,9 @@ class NumberLink(Problem):
 		check = True
 		for i in range(0, len(actions)):
 			newState = State(self.copyList(state.grid), state.currentPath, state.lastExtension.copy(), state.pathsCompleted.copy()).action(actions[i])
-			if self.connected(newState):
+			if self.connected(newState):	#2 endpoints have been connected
 				newState = self.nextPath(newState)
-			elif self.numOfNeighboors(state) > 1:
+			elif self.numOfNeighboors(state) > 1:	#if the lastExtions has 2 neighboors then there is a shorter path
 				check = False
 			if self.isPossible(newState) and check:
 				yield (actions[i], newState)
@@ -86,6 +85,7 @@ class NumberLink(Problem):
 			
 	
 	def copyList(self, orig):
+		""" Return a copy of a double dimension list"""
 		h = len(orig)
 		l = len(orig[0])
 		copy = []
@@ -96,16 +96,18 @@ class NumberLink(Problem):
 		return copy
 	
 	def nextPath(self, state):
-		"""Return the new state containing the new path to construct."""
+		"""Return the new state containing the new path to construct.
+			The new path to construct is the path that have it's two endpoints the closest.
+			The endpoint to start constructing the path is the rightmost one"""
 		newState = State(self.copyList(state.grid), state.currentPath, state.lastExtension.copy(), state.pathsCompleted.copy())
-		n = 100;                                          "Number of possible actions for a path"
+		n = 100;                                          
 		for key in self.paths.keys():
 			if key not in state.pathsCompleted:	
-				endpoint1 = self.paths[key][0]; "first endpoint"
-				endpoint2 = self.paths[key][1]; "second endpoint"
-				temp = fabs(endpoint1[0]-endpoint2[0]) + fabs(endpoint1[1]-endpoint2[1])
+				endpoint1 = self.paths[key][0] 
+				endpoint2 = self.paths[key][1]
+				temp = fabs(endpoint1[0]-endpoint2[0]) + fabs(endpoint1[1]-endpoint2[1])  #disctance between the two endpoints
 				if temp < n:
-					if endpoint1[1] < endpoint2[1]:
+					if endpoint1[1] < endpoint2[1]:  #check who's the rightmost one
 						cache = endpoint2
 						endpoint2 = endpoint1
 						endpoint1 = cache
@@ -136,7 +138,7 @@ class NumberLink(Problem):
 		
 	def isPossible(self, state):
 		"""Return true if the current state can have a solution.
-			A state don't have a solution if a path can't be construct."""
+			A state don't have a solution if one path can't be construct."""
 		if pathExists(state.grid, self.paths[state.currentPath][1], state.lastExtension) == False:
 					return False
 		for key in self.paths.keys():
@@ -146,21 +148,17 @@ class NumberLink(Problem):
 		return True
 	
 	def numOfNeighboors(self, state):
-		point = state.lastExtension
-		if point[0] == 0 or point[0] == len(state.grid)-1:
-			return 1
-		if point[1] == 0 or point[1] == len(state.grid[0])-1:
-			return 1
+		"""Return the number of neighboors (of the same path) of the lastExtension of a state."""
 		num = 0
-		i = point[0]
-		j = point[1]
-		if state.grid[i-1][j] == state.currentPath:
+		i = state.lastExtension[0]
+		j = state.lastExtension[1]
+		if i != 0 and state.grid[i-1][j] == state.currentPath:
 			num = num + 1
-		if state.grid[i+1][j] == state.currentPath:
+		if i != len(state.grid)-1 and state.grid[i+1][j] == state.currentPath:
 			num = num + 1
-		if state.grid[i][j-1] == state.currentPath:
+		if j != 0 and state.grid[i][j-1] == state.currentPath:
 			num = num + 1
-		if state.grid[i][j+1] == state.currentPath:
+		if j != len(state.grid[0])-1 and state.grid[i][j+1] == state.currentPath:
 			num = num + 1
 		return num
 			
@@ -179,11 +177,10 @@ class State:
 		self.currentPath = currentPath  
 		self.lastExtension = lastExtension
 		self.pathsCompleted = pathsCompleted
-		self.origExtension = self.lastExtension
 			
 	def action(self,action):
 		"""Apply the action on the grid based on the currentPath and the lastExtension coordinates.
-			The action should be a list with the addition to do the current lastExtension"""
+			The action should be a list with the addition to do the current lastExtension coordinates."""
 		i = self.lastExtension[0]
 		j= self.lastExtension[1]
 		i = i + action[0]
@@ -194,7 +191,7 @@ class State:
 		return self
 			
 	def possibleActions(self):
-		"""Return the possible actions possible on the current state"""
+		"""Return the possible actions on the current state."""
 		actions = []
 		i = self.lastExtension[0]
 		j = self.lastExtension[1]
@@ -249,12 +246,10 @@ def inBounds(grid, pos):
 #####################
 
 problem=NumberLink(sys.argv[1])
-#example of bfs search
 node=depth_first_graph_search(problem)
-
-#example of print
+#Print the solution
 path=node.path()
 path.reverse()
 for n in path:
-    print(n.state) #assuming that the __str__ function of states output the correct format"""
+    print(n.state) 
 
