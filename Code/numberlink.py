@@ -1,4 +1,4 @@
-'''NAMES OF THE AUTHOR(S): TODO'''
+'''NAMES OF THE AUTHOR(S): Eddy Ndizera, Solaiman El Jilali (Group 8)'''
 import time
 import sys
 from math import *
@@ -37,7 +37,7 @@ class NumberLink(Problem):
 				line=[]		
 		file.close
 		state = State(grid, 'A', self.paths["A"][0],{})
-		#state = self.nextPath(state)
+		state = self.nextPath(state)
 		self.initial = state
 
 
@@ -53,16 +53,19 @@ class NumberLink(Problem):
 			A successor is a new state in which we applied one of the following action : 
 			"left", "right", "down" or "up". """
 		actions = state.possibleActions()
+		check = True
 		for i in range(0, len(actions)):
 			newState = State(self.copyList(state.grid), state.currentPath, state.lastExtension.copy(), state.pathsCompleted.copy()).action(actions[i])
 			if self.connected(newState):
 				newState = self.nextPath(newState)
-			if self.isPossible(newState):
+			elif self.numOfNeighboors(state) > 1:
+				check = False
+			if self.isPossible(newState) and check:
 				yield (actions[i], newState)
 				
 	
 	def connected(self, state):
-		"""Check if the current path is finished. For that we check if the two endpoints has a neighboor"""
+		"""Check if the current path is finished. For that we check if the two endpoints have a neighboor"""
 		endpoints = self.paths[state.currentPath]       
 		for i in range(0, len(endpoints)):
 			point = endpoints[i]
@@ -95,21 +98,19 @@ class NumberLink(Problem):
 	def nextPath(self, state):
 		"""Return the new state containing the new path to construct."""
 		newState = State(self.copyList(state.grid), state.currentPath, state.lastExtension.copy(), state.pathsCompleted.copy())
-		n = 0;                                          "Number of possible actions for a path"
+		n = 100;                                          "Number of possible actions for a path"
 		for key in self.paths.keys():
 			if key not in state.pathsCompleted:	
 				endpoint1 = self.paths[key][0]; "first endpoint"
 				endpoint2 = self.paths[key][1]; "second endpoint"
-				"""n1 = self.numberOfPossibleActions(state.grid, endpoint1)
-				n2 = self.numberOfPossibleActions(state.grid, endpoint2)
-				temp = n1 + n2
-				if temp < n:
-					pointToExtend = endpoint1#(endpoint1 if n1 < n2 else endpoint2)
-					newState.currentPath = key
-					newState.lastExtension = pointToExtend
-					n = temp"""
 				temp = fabs(endpoint1[0]-endpoint2[0]) + fabs(endpoint1[1]-endpoint2[1])
-				if temp > n:
+				if temp < n:
+					if endpoint1[1] < endpoint2[1]:
+						cache = endpoint2
+						endpoint2 = endpoint1
+						endpoint1 = cache
+						self.paths[key][0] = endpoint1
+						self.paths[key][1] = endpoint2
 					pointToExtend = endpoint1
 					newState.currentPath = key
 					newState.lastExtension = pointToExtend
@@ -143,7 +144,25 @@ class NumberLink(Problem):
 				if pathExists(state.grid, self.paths[key][0], self.paths[key][1]) == False:
 					return False
 		return True
-			
+	
+	def numOfNeighboors(self, state):
+		point = state.lastExtension
+		if point[0] == 0 or point[0] == len(state.grid)-1:
+			return 1
+		if point[1] == 0 or point[1] == len(state.grid[0])-1:
+			return 1
+		num = 0
+		i = point[0]
+		j = point[1]
+		if state.grid[i-1][j] == state.currentPath:
+			num = num + 1
+		if state.grid[i+1][j] == state.currentPath:
+			num = num + 1
+		if state.grid[i][j-1] == state.currentPath:
+			num = num + 1
+		if state.grid[i][j+1] == state.currentPath:
+			num = num + 1
+		return num
 			
 ###############
 # State class #
@@ -160,11 +179,11 @@ class State:
 		self.currentPath = currentPath  
 		self.lastExtension = lastExtension
 		self.pathsCompleted = pathsCompleted
+		self.origExtension = self.lastExtension
 			
 	def action(self,action):
 		"""Apply the action on the grid based on the currentPath and the lastExtension coordinates.
-			The action should be a string with the value of ["right", "down", "left", "up"] that indicates in which direction the lastExtension
-			should be extented"""
+			The action should be a list with the addition to do the current lastExtension"""
 		i = self.lastExtension[0]
 		j= self.lastExtension[1]
 		i = i + action[0]
