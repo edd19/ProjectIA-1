@@ -1,6 +1,7 @@
 '''NAMES OF THE AUTHOR(S): TODO'''
 import time
 import sys
+from math import *
 from os import listdir,system
 from search import *
 
@@ -36,32 +37,28 @@ class NumberLink(Problem):
 				line=[]		
 		file.close
 		state = State(grid, 'A', self.paths["A"][0],{})
+		#state = self.nextPath(state)
 		self.initial = state
 
 
 	def goal_test(self, state):
 		"""Return true if the given state is the goal.
 			For that we check if all paths is completed."""
-		self.connected(state)
-		for key in self.paths.keys():
-			if key not in state.pathsCompleted:
-				return False
-		for i in range(0, len(state.grid)):
-			print(state.grid[i])
-		return True
+		if len(self.paths) == len(state.pathsCompleted):
+			return True
+		return False
     
 	def successor(self, state):
 		"""Return all the successors of a current state.
 			A successor is a new state in which we applied one of the following action : 
 			"left", "right", "down" or "up". """
-		if self.connected(state):
-			state = self.nextPath(state)
-		if state is not None:
-			actions = state.possibleActions()
-			for i in range(0, len(actions)):
-				newState = State(self.copyList(state.grid), state.currentPath, state.lastExtension.copy(), state.pathsCompleted.copy()).action(actions[i])
-				if self.isPossible(newState):
-					yield (actions[i], newState)
+		actions = state.possibleActions()
+		for i in range(0, len(actions)):
+			newState = State(self.copyList(state.grid), state.currentPath, state.lastExtension.copy(), state.pathsCompleted.copy()).action(actions[i])
+			if self.connected(newState):
+				newState = self.nextPath(newState)
+			if self.isPossible(newState):
+				yield (actions[i], newState)
 				
 	
 	def connected(self, state):
@@ -91,28 +88,32 @@ class NumberLink(Problem):
 		copy = []
 		line = []
 		for i in range(0, h):           
-			line = []
-			for j in range(0, l):
-				line.append(orig[i][j])
+			line = orig[i].copy()
 			copy.append(line)
 		return copy
 	
 	def nextPath(self, state):
 		"""Return the new state containing the new path to construct."""
 		newState = State(self.copyList(state.grid), state.currentPath, state.lastExtension.copy(), state.pathsCompleted.copy())
-		n = 9;                                          "Number of possible actions for a path"
+		n = 0;                                          "Number of possible actions for a path"
 		for key in self.paths.keys():
-			if key not in state.pathsCompleted:
+			if key not in state.pathsCompleted:	
 				endpoint1 = self.paths[key][0]; "first endpoint"
 				endpoint2 = self.paths[key][1]; "second endpoint"
-				n1 = self.numberOfPossibleActions(state.grid, endpoint1)
+				"""n1 = self.numberOfPossibleActions(state.grid, endpoint1)
 				n2 = self.numberOfPossibleActions(state.grid, endpoint2)
 				temp = n1 + n2
 				if temp < n:
-					pathToConstruct = key
-					pointToExtend = (endpoint1 if n1 < n2 else endpoint2)
+					pointToExtend = endpoint1#(endpoint1 if n1 < n2 else endpoint2)
 					newState.currentPath = key
 					newState.lastExtension = pointToExtend
+					n = temp"""
+				temp = fabs(endpoint1[0]-endpoint2[0]) + fabs(endpoint1[1]-endpoint2[1])
+				if temp > n:
+					pointToExtend = endpoint1
+					newState.currentPath = key
+					newState.lastExtension = pointToExtend
+					n = temp
 		return newState
 				
 		
@@ -135,6 +136,8 @@ class NumberLink(Problem):
 	def isPossible(self, state):
 		"""Return true if the current state can have a solution.
 			A state don't have a solution if a path can't be construct."""
+		if pathExists(state.grid, self.paths[state.currentPath][1], state.lastExtension) == False:
+					return False
 		for key in self.paths.keys():
 			if key not in state.pathsCompleted and key != state.currentPath:
 				if pathExists(state.grid, self.paths[key][0], self.paths[key][1]) == False:
@@ -164,14 +167,8 @@ class State:
 			should be extented"""
 		i = self.lastExtension[0]
 		j= self.lastExtension[1]
-		if action == "left":
-			j = j-1
-		elif action == "right":
-			j = j+1
-		elif action == "down":
-			i = i+1
-		elif action == "up":
-			i = i-1
+		i = i + action[0]
+		j = j + action[1]
 		self.grid[i][j] = self.currentPath
 		self.lastExtension[0] = i
 		self.lastExtension[1] = j
@@ -180,19 +177,16 @@ class State:
 	def possibleActions(self):
 		"""Return the possible actions possible on the current state"""
 		actions = []
-		"""print(self.grid)
-		print(self.currentPath)
-		print(self.lastExtension)"""
 		i = self.lastExtension[0]
 		j = self.lastExtension[1]
 		if j != 0 and self.grid[i][j-1] == '.':
-			actions.append("left")
+			actions.append([0,-1])
 		if j != len(self.grid[0])-1 and self.grid[i][j+1] == '.':
-			actions.append("right")
-		if i != len(self.grid)-1 and self.grid[i+1][j] == '.':
-			actions.append("down")
+			actions.append([0, 1])
 		if i != 0 and self.grid[i-1][j] == '.':
-			actions.append("up")
+			actions.append([-1, 0])
+		if i != len(self.grid)-1 and self.grid[i+1][j] == '.':
+			actions.append([1, 0])
 		return actions
 		
 	def __str__(self):
