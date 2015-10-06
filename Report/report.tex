@@ -23,15 +23,16 @@ Here are the answers to the questions regarding the AIMA library.
 	\item \textbf{In order to perform a search, what are the classes that you must define or extend ? Explain precisely why and where they are used inside a tree\_search.} \\
 
 	
-	In order to perform a search, the \textbf{Problem} class must be defined. We'll have to implement the following 3 methods  \textit{init}, \textit{goal\_test} and \textit{successor}. \\
-	To explain why and where they are used inside a tree\_search, i'll use the pseudocode for a tree\_search (found in the textbook of the course "IA: A modern approach").\\
-	
-		
-\begin{figure}[!h] %on ouvre l'environnement figure
-\includegraphics{Tree-Search.png} %ou image.png, .jpeg etc.
-\caption{Tree-Search from \textit{Artificial Intelligence a Modern Approach}} %la légende
-\label{image_soleil} %l'étiquette pour faire référence à cette image
-\end{figure} %on ferme l'environnement figure 
+	In order to perform a search, the \textbf{Problem} class must be defined. We'll have to implement the following 3 methods  \textit{init}, \textit{goal\_test} and \textit{successor}. To explain why and where they are used inside a tree\_search, we will use the pseudocode for a tree\_search (\textit{found in the textbook of the course "IA: A modern approach"}).
+	\begin{verbatim}
+	function TREE-SEARCH(problem) return a solution or failure
+	   initialize the frontier using the initial state of problem
+	   loop do
+			if the frontier is empty then return failure
+			choose a leaf node and remove it from the frontier
+			if the node contains a goal state then return the corresponding solution
+			expand the chosen node, adding the resulting nodes to the frontier
+\end{verbatim}
 	
 	In the pseudocode, we see that to initialize we need the initial state of the problem. This initial state is given by the \textit{init} method found in the \textit{Problem} class.\\
 	At line 5 of the same pseudocode, to know if we reach the goal, the \textit{goal\_test} method should be called to know that.\\
@@ -44,10 +45,9 @@ Here are the answers to the questions regarding the AIMA library.
 	
 	\item \textbf{In the expand method of the class Node what is the advantage of using a yield instead of building a list and returning it afterwards?} \\
 	
-	In python, the \textit{yield} operator allows us to perform \textbf{lazily}. Indeed the call to the lazy operator do only one thing: returning a generator object that will be call later. It allows us to give out new values on the fly and to save memory space.\\ 
+	In python, the \textit{yield} operator allows us to perform \textbf{lazily}. Indeed the call to the lazy operator do only one thing: returning a generator object that will be call later. It allows us to give out new values on the fly and to save memory space by expanding nodes only if we need it.\\ 
 	
-	
-	\item \textbf{Both breadth\_first\_graph\_search and depth\_first\_graph\_search are matking a call to the same function. How is their fundamental difference implemented?} \\
+	\item \textbf{Both breadth\_first\_graph\_search and depth\_first\_graph\_search are making a call to the same function. How is their fundamental difference implemented?} \\
 	
 	The fundamental difference between the two functions is the type of queue that they put as parameter when calling the function \textit{graph\_search}. The first one (breadth) put as queue a \textit{FIFOQueue} whereas the second one (depth) use a \textit{Stack} \textit{LIFOQueue}.\\
 	
@@ -57,13 +57,21 @@ Here are the answers to the questions regarding the AIMA library.
 	
 	\item \textbf{What is the difference between the implementation of the graph\_search and the tree\_search methods and how does it impact the search methods?}\\
 	
-	The difference between the tree\_search and the graph\_search is the variable \textit{closed} that is a data structure that records the nodes (states) already visited. It ensures us to avoid the infinite loop problem (occuring in depth\_first). 
+	The difference between the tree\_search and the graph\_search is the variable \textit{closed} that is a data structure that records the nodes (states) already visited. It ensures us to avoid the infinite loop problem (occuring in depth\_first). \\
+	
+	Indeed, it is possible to repeat a sequence of states an infinite number of times when building the tree. It implies that an infinite loop can occur in the algorithm. \\
+	
+	Graph search avoid this situation by keeping track of all visited states in a closed list. In this way, if the search algorithm treats a node with a state already in the closed list it will be discarded.
+	Moreover, the presence of this closed list implies that graph search requires more memory, as it keeps track of all visited states \\
 	
 	\item \textbf{What kind of structure is used to implement the closed list? What are the methods involved in the search of an element inside it? What properties must thus have the elements that you can put inside the closed list ?} \\
 	
 	The closed list is implemented using a \textbf{dictionnary}. It uses a pair (key, value) to store elements. The \textit{key} is used to search (like an index) the \textit{value}. \\
+	T
+	To search an element, the hash value of the object used as key \\
 	
-	To search an element, the hash value of the object used as key 
+	The closed list is implemented using a dictionnary.\\
+	It uses a key to search a value in it. So any element is stored as a key-value pair. The key is like an index in the dictionnary and the value, the element stored.\\
 	
 	The elements must be comparable?, unique?, immutable?.
 	
@@ -79,15 +87,13 @@ Here are the answers to the questions regarding the AIMA library.
 	
 	\item \textbf{ Explain the advantages and weaknesses of the following search strategies on this problem (not in general): depth first, breadth first.} \\
 	
-	The depth first search in general takes less time than the breadth first one. Also in this particular problem, the depth first has the completness property like the breadth first because there cannot have infinite search (if the grid is filled then the branch stops there). \\
+	The depth first search in general takes less time than the breadth first one. For the numberlink problem, the max depth of a branch is the number of points "." in the grid. The solution of an instance (the goal state) has this same depth because we need to fill all the points in the grid. And so, the fact that the breadth first visits all nodes by level in the tree and that the depth first visits branch by branch makes the last one faster than the other because the depth first search goes directly to the last level of the tree.\\
 	
-	For the space occupied by the two search algorithm, this is not a issue because we use a yield to expand a node and not a list. \\
-	
-	The breadth first is advantageous with trees that have a high branching factor.
-	%Me semble incomplet
-	
+	 Also in this particular problem, the depth first search has the completness property like the breadth first because there cannot have infinite search (if the grid is filled then the branch stops there). \\
+		
 	\item \textbf{How can we exploit the uniqueness of solution to reduce the search space? Why is the method pathExists useful?} \\
-	
+
+
 	The fact that the solution is unique reduces the search space because we can stop our search when  we found a solution that respects the condition given. We don't need to search a solution that could be more optimal because there isn't another solution. \\
 	
 	The method pathExists is useful to know if a a current node won't give a solution to the problem. Indeed, we can check , for example, for all paths if their two endpoints can be joined. If the check gives a negative response, then we can say that this node won't give a solution. It's a waste of time to expand this node.\\	
@@ -98,13 +104,14 @@ Here are the answers to the questions regarding the AIMA library.
 	
 	The choice of endpoints is also important because if we consider path A that has its two endpoints on the same line for example. If we expand the nodes by the following actions in that order : left, right, up and down. The faster solution is to pick the endpoints that is rightmost.\\
 	
+	
 	\item \textbf{What are the advantages and disadvantages of using the tree and graph search for this problem. Which approach would you choose? Which approach allows you to avoid expending twice symmetrical states?} \\
 	
-	The tree search takes less time in case that the problem cannot have symmetrical states. But the graph search could save time in case symmetrical states are present in the search. \\
+	The graph search could save time in case symmetrical states can be present for the particular instance. But the tradeoff  is that it occupies more memory space because we have to keep track of all states visited.\\
 	
-	The tree search doesn't lose time in checking if the current node has already been visited. Note that this problem cannot have infinite loop (explain why). \\
+	The tree search doesn't lose time in checking if the current node has already been visited and therefore takes less time in instances that cannot have symmetrical states. Note that this problem cannot have infinite loop (because of the fact that the grid can be filled) and so one of the advantage of the graph search is lost. \\
 	
-	We will choose the graph search approach. 
+	We will choose the graph search.
 	
 	\item \textbf{Implement this problem in Python 3. Extend the Problem class and implement the necessary methods and other class(es) if necessary. Your file must be named numberlink.py. You program must take as only input the path to the init file of the problem to solve. It must print to the standard output a solution to the problem satisfying the above format. Your file must be encoded in utf-8. Submit your program on INGInious.} \\
 	
