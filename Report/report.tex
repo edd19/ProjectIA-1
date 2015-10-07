@@ -9,11 +9,19 @@
 
 \title{LINGI2261: Artificial Intelligence \\
 Assignement 1 : Solving Problems with Uninformed Search - Numberlink Project}
-\author{Ndizera Eddy \and El Jilali Solaiman}
+\author{Group 8: Ndizera Eddy \and El Jilali Solaiman}
 \date{\today}
 \maketitle
 
 \section*{Introduction}
+
+In the context of the course "LINGI2261: Artificial Intelligence", we were given an assignement. This assignement is about solving numberlink problem using uninformed search. For that, we were given the AIMA library containing methods to do tree and graph search. This report is divided into two parts:
+\begin{itemize}
+	\item Python AIMA where we answer questions regarding the AIMA library
+	\item Numberlink Problem in which we answers more advanced questions about the problem to solve (numberlink problems).
+\end{itemize}
+
+Our implementation of the code \textit{numberlink.py} can be found in INGINIOUS.
 
 \section{Python AIMA}
 
@@ -67,13 +75,8 @@ Here are the answers to the questions regarding the AIMA library.
 	\item \textbf{What kind of structure is used to implement the closed list? What are the methods involved in the search of an element inside it? What properties must thus have the elements that you can put inside the closed list ?} \\
 	
 	The closed list is implemented using a \textbf{dictionnary}. It uses a pair (key, value) to store elements. The \textit{key} is used to search (like an index) the \textit{value}. \\
-	T
-	To search an element, the hash value of the object used as key \\
 	
-	The closed list is implemented using a dictionnary.\\
-	It uses a key to search a value in it. So any element is stored as a key-value pair. The key is like an index in the dictionnary and the value, the element stored.\\
-	
-	The elements must be comparable?, unique?, immutable?.
+	The methods involved when searching an element inside it are the \textit{hash} and \textit{eq} methods of the object serving as key. We can say that the hash value is there to indicate in which room is the element and eq to indicate if its the correct locker. The elements must thus be immutable.
 	
 	\item \textbf{How technically can you use the implementation of the closed list to deal with symmetrical states ? }\\
 	
@@ -115,11 +118,111 @@ Here are the answers to the questions regarding the AIMA library.
 	
 	\item \textbf{Implement this problem in Python 3. Extend the Problem class and implement the necessary methods and other class(es) if necessary. Your file must be named numberlink.py. You program must take as only input the path to the init file of the problem to solve. It must print to the standard output a solution to the problem satisfying the above format. Your file must be encoded in utf-8. Submit your program on INGInious.} \\
 	
+	See inginious for our implementation.\\
+	
 	\item \textbf{Experiments must be realized with the 10 instances of the numberlink problem provided. Report in a table the results on the 10 instances for depth-first and breadth- first strategies on both tree and graph search (4 settings). You must report the time, the number of explored nodes and the number of steps from root to solution. When no solution can be found by a strategy in a reasonable time (3 min), explain the reason (time-out and/or swap of the memory). What do you conclude from those experiments?} \\
 	
+	The table \ref{benchmark} reports the results when launching the 10 instances with the different search algorithms. The \textit{time} property indicates the time in seconds to solve the problem. The \textit{nodes} property is the number of nodes visited when searching for the solution and finally the \textit{steps} property is the depth of the node containing the goal state in the tree. \\
+	
+	A timeout is when the algorithm take more than 3 minutes to solve an instance of the problem. It occurs generaly for the breadth-first when solving a case with a lot of choices because we need to visit all nodes level by level. Indeed, when comparing the number of nodes visited for the depth first and the breadt first, we see that the breadt first visits a greater number of nodes.\\
+	
+	Those results show us that the depth-first is in most case faster than the breadth-first search algorithm because the first one search the solution in a more straighforward way. Also, we notice than the graph search takes less time than the tree search in some cases but takes more time in other cases. This can be because some cases present symmetrical states. \\
+	
+	We can conclude this observation by pointing the fact that the time taken to solve an instance jumps radically between level39 instance and level2 one. This is due to the fact that the algorithm visits a big amount of nodes at that point.
+	
+\begin{table}
+	\caption{\label{benchmark} Search results on different instances}
+	\begin{tabular}{|c|c|c|c|c|c|}
+	\hline 
+	File & Properties & Depth-first & Breadth-first & Depth-first graph & Breadth-first graph \\ 
+	\hline 
+	 &  &  &  &  & \\ 
+	\hline 
+	easy & Time & 0 & 0 & 0 & 0 \\ 
+	\hline 
+	 & Nodes & 14 & 14 & 14 & 14 \\ 
+	\hline 
+	 & Steps & 13 & 13 & 13 & 13 \\ 
+	 \hline 
+	 &  &  &  &  & \\ 
+	\hline 
+	path & Time & 0.1 & 1.5 & 0.4 & 0.7 \\ 
+	\hline 
+	 & Nodes & 71 & 867 & 71 & 469 \\ 
+	\hline 
+	 & Steps & 71 & 71 & 71 & 71 \\ 
+	 \hline 
+	 &  &  &  &  & \\ 
+	\hline 
+	wiki & Time & 0.1 & 0.1 & 0.3 & 0.4 \\ 
+	\hline 
+	 & Nodes & 166 & 226 & 166 & 226 \\ 
+	\hline 
+	 & Steps & 40 & 40 & 40 & 40 \\ 
+	 \hline 
+	 &  &  &  &  & \\ 
+	\hline 
+	level4 & Time & 0.5 & 0.5 & 0.4 & 0.5 \\ 
+	\hline 
+	 & Nodes & 500 & 578 & 172 & 578 \\ 
+	\hline 
+	 & Steps & 49 & 49 & 49 & 49 \\ 
+	\hline 
+	 &  &  &  &  & \\ 
+	\hline 
+	level9 & Time & 0.3 & 1 & 0.4 & 0.8 \\ 
+	\hline 
+	 & Nodes & 359 & 1132 & 76 & 1018 \\ 
+	\hline 
+	 & Steps & 53 & 53 & 53 & 53 \\ 
+	  \hline 
+	 &  &  &  &  & \\ 
+	\hline 
+	level38 & Time & 0.1 & 0.2 & 0.3 & 0.2 \\ 
+	\hline 
+	 & Nodes & 178 & 340 & 138 & 269 \\ 
+	\hline 
+	 & Steps & 38 & 38 & 38 & 38 \\ 
+	  \hline 
+	 &  &  &  &  & \\ 
+	\hline 
+	level39 & Time & 0.5 & 0.7 & 0.9 & 0.7 \\ 
+	\hline 
+	 & Nodes & 1187 & 1338 & 1187 & 1338 \\ 
+	\hline 
+	 & Steps & 40 & 40 & 40 & 40 \\ 
+	  \hline 
+	 &  &  &  &  & \\ 
+	\hline 
+	level2 & Time & 102 & 105 & 79 & 93 \\ 
+	\hline 
+	 & Nodes & 115898 & 116318 & 82430 & 109762 \\ 
+	\hline 
+	 & Steps & 69 & 69 & 69 & 69 \\ 
+	  \hline 
+	 &  &  &  &  & \\ 
+	\hline 
+	level10 & Time & 168 & timeout & 182 & timeout \\ 
+	\hline 
+	 & Nodes & 204566 & • & 231519 & • \\ 
+	\hline 
+	 & Steps & 75 & • & 75 & • \\
+	  \hline 
+	 &  &  &  &  & \\  
+	\hline 
+	level15 & Time & timeout & timeout & timeout & timeout \\ 
+	\hline 
+	 & Nodes & • & • & • & • \\ 
+	\hline 
+	 & Steps & • & • & • & • \\ 
+	\hline 
+	\end{tabular} 
+\end{table}
 
 \end{enumerate}
 
 \section*{Conclusion}
+
+In conclusion, after answering the above questions that gives a lot of piste when designing our solution, we implemented the program. Our code succeed in passing the inginious testing after optimizing some parts of the code especially our successor method.
 
 \end{document}
